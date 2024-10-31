@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>오리잡기</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lilita+One&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Hi+Melody&display=swap" rel="stylesheet">
+
+    <style type="text/css">
+        .lilita-one-regular {
+            font-family: "Lilita One", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+        .hi-melody-regular {
+            font-family: "Hi Melody", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+        .wrap {
+            width: 800px; 
+            margin:0; 
+            padding-top: 20%; 
+            padding-left:5%; 
+        }
+        .flex { display: flex; }
+        .bg_f { display:block; position:relative; width: 33.3%; height: 400px; }
+        .bg_f img { width: 100%; height: auto; }
+        .r { position: absolute; left:0px; top:0px; width: 266px; height: auto; }
+        .item1:hover .r, .item2:hover .r, .item3:hover .r { display: none; }
+        body {
+            margin: 0; padding: 0;
+            overflow: hidden;
+            background-image: url('back.jpg');
+            background-size: 100% auto;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        h1 { 
+            font-family: "Lilita One", sans-serif;
+            font-size: 100px;
+            color: orange;
+            margin: 0;
+            padding-top: 5%;
+            padding-left: 5%;
+            padding-bottom: 1%;
+            text-shadow: -2px 0 #000, 0 2px #000, 2px 0 #000, 0 -2px #000;
+            position: absolute;
+            z-index: 1; /* 항상 보이게 수정 */
+        }
+        p1 { 
+            padding-left: 6%;
+            padding-bottom: 5%;
+            font-family: "Hi Melody", sans-serif;
+            font-size: 25px;
+            position: absolute;
+            top: 200px;
+            left: 20px;
+            z-index: 1; /* 항상 보이게 수정 */
+        }
+        .box {
+            width: 190px;
+            height: 190px;
+            position: absolute;
+            background-image: url('mom.png');
+            background-size: cover;
+            z-index: 10;
+        }
+        .mon {
+            width: 130px;
+            height: 130px;
+            position: absolute;
+            background-image: url('monster.png');
+            background-size: cover;
+            z-index: 10;
+        }
+        #popup {
+            font-family: "Hi Melody", sans-serif;
+            display: none;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 50px;
+            text-align: center;
+            padding-top: 200px;
+            padding-bottom: 10px;
+            z-index: 9999;
+            cursor: pointer;
+        }
+
+        #resetButtonSuccess {
+            font-family: "Hi Melody", sans-serif;
+            background:orange;
+            border: 3px;
+            color:white;
+            font-size: 20px;
+            outline: none;
+
+        }
+
+
+        #resetButtonFail {
+            font-family: "Hi Melody", sans-serif;
+            background:orange;
+            border: 3px;
+            color:white;
+            font-size: 20px;
+            outline: none;
+
+        }
+
+
+        /* 실패 팝업 스타일 */
+        #failPopup {
+            font-family: "Hi Melody", sans-serif;
+            display: none;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 50px;
+            text-align: center;
+            padding-top: 200px;
+            padding-bottom: 10px;
+            z-index: 9999;
+        }
+
+
+
+        /* 커서를 따라오는 텍스트 */
+        #movingText {
+            position: absolute;
+            font-size: 24px;
+            font-family: 'Hi Melody', sans-serif;
+            color: blue;
+            z-index: 999;
+            pointer-events: none;
+        }
+
+
+
+
+    </style>
+</head>
+<body>
+
+    <!-- 커서를 따라다니는 텍스트 추가 -->
+    <div id="movingText">꽥꽥꽦꽥꽦꽥<br>꽥꽥꽦꽥꽦꽥</div>
+
+    <!-- 화면에 여러 박스 배치 -->
+    <div class="box" style="left: 50px; top: 200px;"></div>
+
+    <!-- 팝업창 -->
+    <div id="popup">
+        🐥🐥🐥🐥🐥🐥<br>엄마 오리가 아기오리들을 다 모았어요! <br>
+        <button id="resetButtonSuccess">오리 모으러 가기</button> 
+    </div>
+
+
+    <!-- 실패 팝업창 추가 -->
+<div id="failPopup">
+    👎👎👎👎👎👎<br>아기 오리를 다 모으지 못했습니다! <br>
+    다시 시도해보세요! <br>
+    <button id="resetButtonFail">오리 모으러 가기</button> 
+</div>
+
+    <!-- 제목과 안내문 추가 -->
+    <h1>Catch the duckling!</h1>
+    <p1>엄마 오리를 클릭하고 방향키로 움직여 여기저기 흩어진 아기 오리들을 모아주세요</p1>
+
+
+    <div id="monsterCount" style="position: absolute; top: 10px; right: 20px; font-size: 20px; font-family: Hi Melody; color: white; background: blue;">
+        엄마랑 만난 오리: <span id="caughtMonsters">0</span> / 도망가는 오리: <span id="remainingMonsters">6</span>
+    </div>
+
+
+    <!-- 타이머 추가 -->
+<div id="timer" style="position: absolute; top: 10px; left: 20px; font-size: 20px; font-family: 'Hi Melody'; color: white; background: orange;">
+   남은 시간: 20
+</div>
+
+    <div class="wrap flex">
+        <a class="bg_f item1"> 
+            <img src="b1.jpg">
+            <img class="r" src="a1.jpg">
+        </a>
+        <a class="bg_f item2">
+            <img src="b2.jpg">
+            <img class="r" src="a2.jpg">
+        </a>
+        <a class="bg_f item3">
+            <img src="b3.jpg">
+            <img class="r" src="a3.jpg"> 
+        </a>
+    </div>
+
+    <!-- 오디오 요소 추가 -->
+    <audio id="catchSound" src="toyduck.mp3" preload="auto"></audio>
+
+    <script type="text/javascript">
+        let activeBox = null;
+        let monPosition = [];
+        let monNum = 6;
+        let caughtNum = 0;
+        let caughtMonsters = []; // 잡힌 몬스터들을 추적
+        let spacing = 50; // 각 몬스터가 박스 옆에 얼마나 떨어져 있을지 간격 설정
+        let timeLimit = 30; // 제한 시간 30초
+        let timerInterval;  // 타이머를 위한 변수
+
+       function startTimer() {
+    let timeLeft = timeLimit;
+    document.getElementById('timer').innerText = `남은시간: ${timeLeft}초`;
+
+    timerInterval = setInterval(function() {
+        timeLeft--;
+        document.getElementById('timer').innerText = `남은시간: ${timeLeft}초`;
+
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            if (caughtNum < monNum) {
+                showFailPopup();
+            }
+        }
+    }, 1000);
+}
+
+        // 마우스 움직임에 따라 텍스트 이동
+        document.addEventListener('mousemove', function(event) {
+            let movingText = document.getElementById('movingText');
+            movingText.style.left = event.pageX + 10 + 'px';
+            movingText.style.top = event.pageY + 10 + 'px';
+        });
+
+        function updateMonsterCount() {
+            document.getElementById('caughtMonsters').innerText = caughtNum;
+            document.getElementById('remainingMonsters').innerText = monNum - caughtNum;
+        }
+
+        function createMon(i) {
+            let monster = document.createElement("div");
+            monster.className = "mon";
+            monster.id = "mon" + i;
+
+            let monX = Math.random() * (innerWidth - 100) / 100;
+            let monY = Math.random() * (innerHeight - 100) / 100;
+            let mX = monX.toFixed(0) * 100;
+            let mY = monY.toFixed(0) * 100;
+
+            monPosition.push([mX, mY, monster.id]);
+            monster.style.left = mX + "px";
+            monster.style.top = mY + "px";
+            document.body.appendChild(monster);
+        }
+
+        function moveMonsters() {
+            const maxX = window.innerWidth - 150; 
+            const maxY = window.innerHeight - 130; 
+
+            monPosition.forEach((mon, index) => {
+                let monster = document.getElementById(mon[2]);
+                let direction = Math.floor(Math.random() * 4);
+
+                let newX = mon[0];
+                let newY = mon[1];
+
+                if (direction === 0 && newX > 0) { 
+                    newX -= 100;
+                } else if (direction === 1 && newX < maxX) { 
+                    newX += 100;
+                } else if (direction === 2 && newY > 0) { 
+                    newY -= 100;
+                } else if (direction === 3 && newY < maxY) { 
+                    newY += 100;
+                }
+
+                if (newX >= 0 && newX <= maxX) {
+                    mon[0] = newX; 
+                }
+                if (newY >= 0 && newY <= maxY) {
+                    mon[1] = newY; 
+                }
+
+                monster.style.left = mon[0] + "px";
+                monster.style.top = mon[1] + "px";
+            });
+        }
+
+        const boxes = document.querySelectorAll('.box');
+        boxes.forEach(box => {
+            box.xplot = parseInt(box.style.left);
+            box.yplot = parseInt(box.style.top);
+
+            box.onclick = function() {
+                activeBox = box;
+            }
+        });
+
+        document.onkeydown = function(e) {
+            let a = e.keyCode;
+            if (activeBox) {
+                if (a == 38) { activeBox.yplot -= 50; activeBox.style.top = activeBox.yplot + "px"; }
+                if (a == 40) { activeBox.yplot += 50; activeBox.style.top = activeBox.yplot + "px"; }
+                if (a == 39) { activeBox.xplot += 50; activeBox.style.left = activeBox.xplot + "px"; }
+                if (a == 37) { activeBox.xplot -= 50; activeBox.style.left = activeBox.xplot + "px"; }
+
+                caughtMonsters.forEach((monster, index) => {
+                    monster.style.left = activeBox.xplot - spacing * (index + 1) + "px";
+                    monster.style.top = activeBox.yplot + "px";
+                });
+
+                monPosition.forEach((mon, index) => {
+                    if (activeBox.xplot == mon[0] && activeBox.yplot == mon[1]) {
+                        //alert("아기 오리를 잡았어요!");
+                        let caughtMonster = document.getElementById(mon[2]);
+
+                        caughtMonsters.push(caughtMonster);
+                        caughtMonster.style.position = 'absolute';
+                        caughtMonster.style.zIndex = '999';
+
+                        monPosition.splice(index, 1);
+                        caughtNum++;
+                        updateMonsterCount();
+
+                        document.getElementById('catchSound').play();
+
+                        showCatchText(); {
+                            if (!activeBox) return {}
+                        }
+
+                        if (monPosition.length === 0) {
+                            showPopup();
+                        }
+                    }
+                });
+            }
+        }
+
+
+        function showCatchText() {
+
+    if (!activeBox) return;
+
+            let catchText = document.createElement("div");
+            catchText.innerText = "잡았다!";
+            catchText.style.position = "absolute";
+            catchText.style.left = `${activeBox.xplot + 20}px`; // 박스의 약간 오른쪽
+            catchText.style.top = `${activeBox.yplot - 20}px`; // 박스의 약간 위쪽
+            catchText.style.fontSize = "30px";
+            catchText.style.color = "blue";
+            catchText.style.fontFamily = "'Hi Melody', sans-serif";
+            catchText.style.zIndex = "1000";
+            catchText.style.pointerEvents = "none"; // 마우스 이벤트가 차단되도록 설정
+
+            // body에 텍스트 추가
+            document.body.appendChild(catchText);
+
+            // 1초 후 텍스트 제거
+            setTimeout(() => {
+                catchText.remove();
+            }, 1000);
+        }
+
+
+
+        function showPopup() {
+            let popup = document.getElementById('popup');
+            popup.style.display = 'block';
+        }
+
+        // 실패 팝업 표시
+function showFailPopup() {
+    let failPopup = document.getElementById('failPopup');
+    failPopup.style.display = 'block';
+}
+
+
+        // 실패 팝업 닫기 기능
+document.getElementById('failPopup').onclick = function() {
+    this.style.display = 'none';
+}
+
+       // 리셋 버튼 클릭 시 게임을 초기화하는 함수
+function resetGame() {
+    monPosition = [];
+    caughtNum = 0;
+    caughtMonsters = [];
+    activeBox = null;
+    clearInterval(timerInterval);  // 이전 타이머 중지
+
+           // 화면에 있는 몬스터들을 모두 제거
+    document.querySelectorAll('.mon').forEach(monster => monster.remove());
+
+    // 새로 몬스터 생성
+    for (let i = 0; i < monNum; i++) {
+        createMon(i);
+    }
+
+    updateMonsterCount();
+    startTimer();  // 타이머 다시 시작
+    document.getElementById('popup').style.display = 'none';
+    document.getElementById('failPopup').style.display = 'none';  // 실패 팝업 숨기기
+}
+
+        for (let i = 0; i < monNum; i++) {
+            createMon(i);
+        }
+
+        setInterval(moveMonsters, 1500);
+        updateMonsterCount();
+        startTimer()
+
+
+        // 성공 팝업의 리셋 버튼 이벤트
+document.getElementById('resetButtonSuccess').onclick = function() {
+    resetGame();
+};
+
+// 실패 팝업의 리셋 버튼 이벤트
+document.getElementById('resetButtonFail').onclick = function() {
+    resetGame();
+};
+    </script>
+</body>
+</html>
